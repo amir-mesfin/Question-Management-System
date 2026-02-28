@@ -4,6 +4,8 @@ import { FaGraduationCap, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import useAuthStore from './store/authStore';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
+import QuestionList from './features/questions/QuestionList';
+import QuestionForm from './features/questions/QuestionForm';
 
 function App() {
   const { user, logout } = useAuthStore();
@@ -66,12 +68,12 @@ function App() {
             element={
               user ? (
                 <div className="px-4 py-6 sm:px-0">
-                  <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex flex-col items-center justify-center bg-white p-6">
-                    <h2 className="text-2xl font-semibold mb-2">Welcome to the Dashboard, {user.name}!</h2>
-                    <p className="text-gray-500 mb-4">You are logged in as a <strong className="text-blue-600">{user.role}</strong>.</p>
-                    <p className="text-gray-400 text-sm max-w-md text-center">
-                      (Question management features will be implemented in the next phase.)
-                    </p>
+                  <div className="border-4 border-dashed border-gray-200 rounded-lg min-h-96 flex flex-col items-center justify-center bg-white p-6">
+                    <h2 className="text-3xl font-bold mb-3 text-gray-900">Welcome to the Dashboard, {user.name}!</h2>
+                    <p className="text-gray-500 mb-8 max-w-lg text-center">You are logged in as an <strong className="text-blue-600 font-semibold">{user.role}</strong>. From here you can manage the question bank and soon create exams.</p>
+                    <Link to="/questions" className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow font-medium hover:bg-blue-700 transition">
+                      Go to Question Bank
+                    </Link>
                   </div>
                 </div>
               ) : (
@@ -79,6 +81,9 @@ function App() {
               )
             }
           />
+          <Route path="/questions" element={user ? <QuestionList /> : <Navigate to="/login" />} />
+          <Route path="/questions/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
+          <Route path="/questions/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         </Routes>
