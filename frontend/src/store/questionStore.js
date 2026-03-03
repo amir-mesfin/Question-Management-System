@@ -110,6 +110,52 @@ const useQuestionStore = create((set, get) => ({
     },
 
     clearError: () => set({ error: null }),
+
+    exportQuestions: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const { data } = await api.get('/questions/export');
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `questions_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            set({ isLoading: false });
+            return data;
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || 'Failed to export questions',
+                isLoading: false,
+            });
+            throw error;
+        }
+    },
+
+    importQuestions: async (questionsData) => {
+        set({ isLoading: true, error: null });
+        try {
+            const { data } = await api.post('/questions/import', questionsData);
+
+            get().fetchQuestions({
+                page: get().pagination.page
+            });
+
+            set({ isLoading: false });
+            return data;
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || 'Failed to import questions',
+                isLoading: false,
+            });
+            throw error;
+        }
+    },
 }));
 
 export default useQuestionStore;

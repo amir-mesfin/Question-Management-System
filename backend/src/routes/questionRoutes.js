@@ -5,6 +5,8 @@ import {
     getQuestionById,
     updateQuestion,
     deleteQuestion,
+    exportQuestions,
+    importQuestions,
 } from '../controllers/questionController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -17,6 +19,14 @@ router
     .route('/')
     .get(getQuestions)
     .post(authorize('Admin', 'Instructor'), createQuestion);
+
+router
+    .route('/export')
+    .get(authorize('Admin', 'Instructor'), exportQuestions);
+
+router
+    .route('/import')
+    .post(authorize('Admin', 'Instructor'), importQuestions);
 
 router
     .route('/:id')

@@ -162,3 +162,51 @@ export const deleteQuestion = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// @desc    Export questions to JSON
+// @route   GET /api/questions/export
+// @access  Private (Admin/Instructor)
+export const exportQuestions = async (req, res) => {
+    try {
+        const query = {};
+        // If not admin, only export own questions
+        if (req.user.role !== 'Admin') {
+            query.createdBy = req.user._id;
+        }
+
+        const questions = await Question.find(query).select('-__v');
+        res.json(questions);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Import questions from JSON
+// @route   POST /api/questions/import
+// @access  Private (Admin/Instructor)
+export const importQuestions = async (req, res) => {
+    try {
+        const questionsData = req.body;
+
+        if (!Array.isArray(questionsData) || questionsData.length === 0) {
+            return res.status(400).json({ message: 'Invalid or empty question data' });
+        }
+
+        const formattedQuestions = questionsData.map((q) => {
+            const { _id, createdAt, updatedAt, __v, ...questionData } = q;
+            return {
+                ...questionData,
+                createdBy: req.user._id, // Assign to current user
+            };
+        });
+
+        const importedQuestions = await Question.insertMany(formattedQuestions);
+
+        res.status(201).json({
+            message: `Successfully imported ${importedQuestions.length} questions`,
+            count: importedQuestions.length,
+        });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

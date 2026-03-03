@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaDownload, FaUpload } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
 import useAuthStore from '../../store/authStore';
 
 const QuestionList = () => {
-    const { questions, isLoading, error, fetchQuestions, deleteQuestion, pagination } = useQuestionStore();
+    const { questions, isLoading, error, fetchQuestions, deleteQuestion, pagination, exportQuestions, importQuestions } = useQuestionStore();
     const { user } = useAuthStore();
 
     const canManage = user?.role === 'Admin' || user?.role === 'Instructor';
@@ -49,6 +49,35 @@ const QuestionList = () => {
         setPage(1); // Reset to first page on filter change
     };
 
+    const handleExport = async () => {
+        try {
+            await exportQuestions();
+        } catch (err) {
+            console.error('Export failed:', err);
+            alert('Failed to export questions.');
+        }
+    };
+
+    const handleImport = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const json = JSON.parse(event.target.result);
+                await importQuestions(json);
+                alert('Questions imported successfully!');
+                e.target.value = null;
+            } catch (err) {
+                console.error('Import failed:', err);
+                alert('Failed to import questions. Please ensure the JSON format is correct.');
+                e.target.value = null;
+            }
+        };
+        reader.readAsText(file);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -57,13 +86,37 @@ const QuestionList = () => {
                     <p className="text-sm text-gray-500 mt-1">Manage and organize all questions</p>
                 </div>
                 {canManage && (
-                    <Link
-                        to="/questions/new"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
-                    >
-                        <FaPlus />
-                        <span className="hidden sm:inline">Add Question</span>
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <div className="relative overflow-hidden flex items-center">
+                            <button type="button" className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 border border-gray-300 rounded-lg font-medium shadow-sm transition-colors cursor-pointer relative">
+                                <FaUpload />
+                                <span className="hidden sm:inline">Import</span>
+                                <input
+                                    type="file"
+                                    accept=".json"
+                                    onChange={handleImport}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    title="Import JSON"
+                                />
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={handleExport}
+                            className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 border border-gray-300 rounded-lg font-medium shadow-sm transition-colors"
+                        >
+                            <FaDownload />
+                            <span className="hidden sm:inline">Export</span>
+                        </button>
+
+                        <Link
+                            to="/questions/new"
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
+                        >
+                            <FaPlus />
+                            <span className="hidden sm:inline">Add Question</span>
+                        </Link>
+                    </div>
                 )}
             </div>
 
