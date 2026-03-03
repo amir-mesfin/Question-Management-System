@@ -6,6 +6,8 @@ import Login from './features/auth/Login';
 import Register from './features/auth/Register';
 import QuestionList from './features/questions/QuestionList';
 import QuestionForm from './features/questions/QuestionForm';
+import QuizList from './features/quizzes/QuizList';
+import QuizBuilder from './features/quizzes/QuizBuilder';
 
 function App() {
   const { user, logout } = useAuthStore();
@@ -70,10 +72,15 @@ function App() {
                 <div className="px-4 py-6 sm:px-0">
                   <div className="border-4 border-dashed border-gray-200 rounded-lg min-h-96 flex flex-col items-center justify-center bg-white p-6">
                     <h2 className="text-3xl font-bold mb-3 text-gray-900">Welcome to the Dashboard, {user.name}!</h2>
-                    <p className="text-gray-500 mb-8 max-w-lg text-center">You are logged in as an <strong className="text-blue-600 font-semibold">{user.role}</strong>. From here you can manage the question bank and soon create exams.</p>
-                    <Link to="/questions" className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow font-medium hover:bg-blue-700 transition">
-                      Go to Question Bank
-                    </Link>
+                    <p className="text-gray-500 mb-8 max-w-lg text-center">You are logged in as an <strong className="text-blue-600 font-semibold">{user.role}</strong>. From here you can manage the question bank and create quizzes.</p>
+                    <div className="flex gap-4">
+                      <Link to="/questions" className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow font-medium hover:bg-blue-700 transition">
+                        Question Bank
+                      </Link>
+                      <Link to="/quizzes" className="px-6 py-3 bg-green-600 text-white rounded-lg shadow font-medium hover:bg-green-700 transition">
+                        Quiz Bank
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -84,6 +91,11 @@ function App() {
           <Route path="/questions" element={user ? <QuestionList /> : <Navigate to="/login" />} />
           <Route path="/questions/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
           <Route path="/questions/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
+
+          {/* Quiz Routes */}
+          <Route path="/quizzes" element={user ? <QuizList /> : <Navigate to="/login" />} />
+          <Route path="/quizzes/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizBuilder /> : <Navigate to="/quizzes" />} />
+          <Route path="/quizzes/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizBuilder /> : <Navigate to="/quizzes" />} />
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         </Routes>
