@@ -18,7 +18,7 @@ const UserManagement = () => {
     const fetchUsers = useCallback(async () => {
         setIsLoading(true);
         try {
-            const { data } = await api.get('/api/users');
+            const { data } = await api.get('/users');
             setUsers(data);
             setError(null);
         } catch (err) {
@@ -39,7 +39,7 @@ const UserManagement = () => {
     const handleCreateUser = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/api/users', formData);
+            await api.post('/users', formData);
             setFormData({ name: '', email: '', password: '', role: 'Student' });
             fetchUsers();
             alert('User created successfully');
@@ -51,7 +51,7 @@ const UserManagement = () => {
     const handleDeleteUser = async (id) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
             try {
-                await api.delete(`/api/users/${id}`);
+                await api.delete(`/users/${id}`);
                 fetchUsers();
             } catch (err) {
                 alert(err.response?.data?.message || 'Failed to delete user');
@@ -182,8 +182,8 @@ const UserManagement = () => {
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <span className={`hidden sm:inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${user.role === 'Admin' ? 'bg-purple-50 text-purple-700 border-purple-100' :
-                                                user.role === 'Instructor' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                                                    'bg-green-50 text-green-700 border-green-100'
+                                            user.role === 'Instructor' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                                'bg-green-50 text-green-700 border-green-100'
                                             }`}>
                                             {user.role}
                                         </span>

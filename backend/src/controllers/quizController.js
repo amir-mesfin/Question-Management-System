@@ -41,7 +41,7 @@ export const getQuizzes = async (req, res) => {
         // Students only see published quizzes
         if (req.user.role === 'Student') {
             query.isPublished = true;
-        } else if (isPublished !== undefined) {
+        } else if (isPublished === 'true' || isPublished === 'false') {
             query.isPublished = isPublished === 'true';
         }
 
