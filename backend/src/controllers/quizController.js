@@ -1,4 +1,5 @@
 import Quiz from '../models/Quiz.js';
+import Attempt from '../models/Attempt.js';
 
 // @desc    Create a new quiz
 // @route   POST /api/quizzes
@@ -178,6 +179,19 @@ export const submitQuiz = async (req, res) => {
 
         const percentage = (score / totalQuestions) * 100;
         const passed = percentage >= quiz.passingScore;
+
+        // Save the attempt to the database
+        const attempt = new Attempt({
+            user: req.user._id,
+            quiz: quiz._id,
+            score,
+            totalQuestions,
+            percentage: Math.round(percentage),
+            passed,
+            answers: results
+        });
+
+        await attempt.save();
 
         res.json({
             score,

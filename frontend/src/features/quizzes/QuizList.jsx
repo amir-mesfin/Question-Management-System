@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaPlay } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaPlay, FaChartBar } from 'react-icons/fa';
 import useQuizStore from '../../store/quizStore';
 import useAuthStore from '../../store/authStore';
 
@@ -204,6 +204,13 @@ const QuizList = () => {
                                                 >
                                                     <FaTrash />
                                                 </button>
+                                                <Link
+                                                    to={`/quizzes/${quiz._id}/stats`}
+                                                    className="p-2 text-gray-400 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 rounded shadow-sm transition"
+                                                    title="View Stats"
+                                                >
+                                                    <FaChartBar />
+                                                </Link>
                                             </>
                                         )}
                                     </div>

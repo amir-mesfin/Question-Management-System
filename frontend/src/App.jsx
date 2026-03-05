@@ -9,6 +9,9 @@ import QuestionForm from './features/questions/QuestionForm';
 import QuizList from './features/quizzes/QuizList';
 import QuizBuilder from './features/quizzes/QuizBuilder';
 import QuizPlayer from './features/quizzes/QuizPlayer';
+import QuizHistory from './features/quizzes/QuizHistory';
+import QuizStats from './features/quizzes/QuizStats';
+import UserManagement from './features/admin/UserManagement';
 import Dashboard from './features/dashboard/Dashboard';
 
 function App() {
@@ -30,6 +33,8 @@ function App() {
               <Link to="/" className="hover:text-blue-600 transition">Dashboard</Link>
               <Link to="/questions" className="hover:text-blue-600 transition">Questions</Link>
               <Link to="/quizzes" className="hover:text-blue-600 transition">Quizzes</Link>
+              {user.role === 'Student' && <Link to="/history" className="hover:text-blue-600 transition">My History</Link>}
+              {user.role === 'Admin' && <Link to="/admin/users" className="hover:text-blue-600 transition">Users</Link>}
             </nav>
           )}
 
@@ -84,6 +89,16 @@ function App() {
             <Link to="/quizzes" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
               <span>Quizzes</span>
             </Link>
+            {user.role === 'Student' && (
+              <Link to="/history" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
+                <span>History</span>
+              </Link>
+            )}
+            {user.role === 'Admin' && (
+              <Link to="/admin/users" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
+                <span>Users</span>
+              </Link>
+            )}
           </div>
         )}
       </header>
@@ -109,6 +124,9 @@ function App() {
           <Route path="/quizzes/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizBuilder /> : <Navigate to="/quizzes" />} />
           <Route path="/quizzes/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizBuilder /> : <Navigate to="/quizzes" />} />
           <Route path="/quizzes/:id" element={user ? <QuizPlayer /> : <Navigate to="/login" />} />
+          <Route path="/quizzes/:id/stats" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizStats /> : <Navigate to="/quizzes" />} />
+          <Route path="/history" element={user && user.role === 'Student' ? <QuizHistory /> : <Navigate to="/" />} />
+          <Route path="/admin/users" element={user && user.role === 'Admin' ? <UserManagement /> : <Navigate to="/" />} />
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         </Routes>

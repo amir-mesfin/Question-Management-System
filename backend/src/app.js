@@ -5,6 +5,8 @@ import questionRoutes from './routes/questionRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import attemptRoutes from './routes/attemptRoutes.js';
 
 const app = express();
 
@@ -24,5 +26,7 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/attempts', attemptRoutes);
 
 export default app;
