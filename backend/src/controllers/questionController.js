@@ -60,10 +60,12 @@ export const getQuestions = async (req, res) => {
         if (category) query.category = category;
         if (difficulty) query.difficulty = difficulty;
 
-        // Only admins/instructors can see drafts, students only see published
+        // Only admins/instructors can access the full question bank
         if (req.user.role === 'Student') {
-            query.status = 'Published';
-        } else if (status) {
+            return res.status(403).json({ message: 'Not authorized to access the question bank' });
+        }
+
+        if (status) {
             query.status = status;
         }
 
