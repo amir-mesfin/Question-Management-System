@@ -3,6 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import questionRoutes from './routes/questionRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/api/upload', uploadRoutes);
 
 export default app;

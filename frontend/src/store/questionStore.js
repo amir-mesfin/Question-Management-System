@@ -11,6 +11,29 @@ const useQuestionStore = create((set, get) => ({
         pages: 1,
         total: 0,
     },
+    isUploading: false,
+
+    uploadImage: async (file) => {
+        set({ isUploading: true, error: null });
+        try {
+            const formData = new FormData();
+            formData.append('image', file);
+            // Sending as multipart/form-data
+            const { data } = await api.post('/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            set({ isUploading: false });
+            return data.url;
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || 'Failed to upload image',
+                isUploading: false,
+            });
+            throw error;
+        }
+    },
 
     // Fetch all questions with optional filters
     fetchQuestions: async (filters = {}) => {

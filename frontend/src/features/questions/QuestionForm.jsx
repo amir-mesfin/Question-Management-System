@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaExclamationCircle } from 'react-icons/fa';
+import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaExclamationCircle, FaImage, FaSpinner } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
 
 const QuestionForm = () => {
@@ -8,7 +8,7 @@ const QuestionForm = () => {
     const navigate = useNavigate();
     const isEditMode = !!id;
 
-    const { createQuestion, updateQuestion, fetchQuestionById, question: editingQuestion, isLoading } = useQuestionStore();
+    const { createQuestion, updateQuestion, fetchQuestionById, question: editingQuestion, isLoading, uploadImage, isUploading } = useQuestionStore();
 
     const [formData, setFormData] = useState({
         title: '',
@@ -23,6 +23,7 @@ const QuestionForm = () => {
             { text: '', isCorrect: true },
             { text: '', isCorrect: false }
         ],
+        mediaUrl: '',
     });
 
     useEffect(() => {
@@ -48,7 +49,8 @@ const QuestionForm = () => {
                 options: editingQuestion.options?.length > 0 ? editingQuestion.options : [
                     { text: '', isCorrect: true },
                     { text: '', isCorrect: false }
-                ]
+                ],
+                mediaUrl: editingQuestion.mediaUrl || '',
             });
         }
     }, [editingQuestion, isEditMode]);
@@ -56,6 +58,19 @@ const QuestionForm = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const url = await uploadImage(file);
+            setFormData((prev) => ({ ...prev, mediaUrl: url }));
+        } catch (err) {
+            console.error('Image upload failed', err);
+            alert('Failed to upload image. Please try again.');
+        }
     };
 
     const handleOptionChange = (index, field, value) => {
@@ -335,6 +350,41 @@ const QuestionForm = () => {
                             value={formData.explanation}
                             onChange={handleChange}
                         ></textarea>
+                    </div>
+
+                    {/* Media Upload Section */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Question Image (Optional)</label>
+                        <div className="flex items-center gap-4">
+                            {formData.mediaUrl && (
+                                <div className="relative h-24 w-24 rounded-lg overflow-hidden border border-gray-200">
+                                    <img src={formData.mediaUrl} alt="Question preview" className="object-cover h-full w-full" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, mediaUrl: '' }))}
+                                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs hover:bg-red-600 focus:outline-none"
+                                    >
+                                        <FaTrash size={10} />
+                                    </button>
+                                </div>
+                            )}
+
+                            {!formData.mediaUrl && (
+                                <div className="flex items-center">
+                                    <label className="flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                        {isUploading ? <FaSpinner className="animate-spin mr-2" /> : <FaImage className="mr-2 text-gray-400" />}
+                                        {isUploading ? 'Uploading...' : 'Upload Image'}
+                                        <input
+                                            type="file"
+                                            className="sr-only"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            disabled={isUploading}
+                                        />
+                                    </label>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <div className="pt-4 flex justify-end gap-3 border-t border-gray-200">
