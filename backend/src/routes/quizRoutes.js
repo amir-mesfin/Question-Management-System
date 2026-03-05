@@ -5,6 +5,7 @@ import {
     getQuizById,
     updateQuiz,
     deleteQuiz,
+    submitQuiz,
 } from '../controllers/quizController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -23,5 +24,7 @@ router
     .get(getQuizById)
     .put(authorize('Admin', 'Instructor'), updateQuiz)
     .delete(authorize('Admin', 'Instructor'), deleteQuiz);
+
+router.post('/:id/submit', submitQuiz);
 
 export default router;

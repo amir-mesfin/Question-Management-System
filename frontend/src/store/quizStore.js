@@ -106,6 +106,21 @@ const useQuizStore = create((set, get) => ({
         }
     },
 
+    submitQuiz: async (id, answers) => {
+        set({ isLoading: true, error: null });
+        try {
+            const { data } = await api.post(`/quizzes/${id}/submit`, { answers });
+            set({ isLoading: false });
+            return data;
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || 'Failed to submit quiz',
+                isLoading: false,
+            });
+            throw error;
+        }
+    },
+
     clearError: () => set({ error: null }),
 }));
 

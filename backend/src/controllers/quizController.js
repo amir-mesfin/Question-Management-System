@@ -141,3 +141,53 @@ export const deleteQuiz = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+// @desc    Submit quiz answers and get score
+// @route   POST /api/quizzes/:id/submit
+// @access  Private
+export const submitQuiz = async (req, res) => {
+    try {
+        const { answers } = req.body; // Array of { questionId, answerText }
+        const quiz = await Quiz.findById(req.params.id).populate('questions');
+
+        if (!quiz) {
+            return res.status(404).json({ message: 'Quiz not found' });
+        }
+
+        let score = 0;
+        const totalQuestions = quiz.questions.length;
+        const results = [];
+
+        quiz.questions.forEach((question) => {
+            const userAnswer = answers.find(a => a.questionId === question._id.toString());
+            const isCorrect = userAnswer && userAnswer.answerText === question.correctAnswerText;
+
+            if (isCorrect) {
+                score++;
+            }
+
+            results.push({
+                questionId: question._id,
+                title: question.title,
+                userAnswer: userAnswer ? userAnswer.answerText : null,
+                correctAnswer: question.correctAnswerText,
+                isCorrect,
+                explanation: question.explanation
+            });
+        });
+
+        const percentage = (score / totalQuestions) * 100;
+        const passed = percentage >= quiz.passingScore;
+
+        res.json({
+            score,
+            totalQuestions,
+            percentage: Math.round(percentage),
+            passed,
+            results
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+

@@ -8,6 +8,7 @@ import QuestionList from './features/questions/QuestionList';
 import QuestionForm from './features/questions/QuestionForm';
 import QuizList from './features/quizzes/QuizList';
 import QuizBuilder from './features/quizzes/QuizBuilder';
+import QuizPlayer from './features/quizzes/QuizPlayer';
 import Dashboard from './features/dashboard/Dashboard';
 
 function App() {
@@ -107,6 +108,7 @@ function App() {
           <Route path="/quizzes" element={user ? <QuizList /> : <Navigate to="/login" />} />
           <Route path="/quizzes/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizBuilder /> : <Navigate to="/quizzes" />} />
           <Route path="/quizzes/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuizBuilder /> : <Navigate to="/quizzes" />} />
+          <Route path="/quizzes/:id" element={user ? <QuizPlayer /> : <Navigate to="/login" />} />
           <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
           <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         </Routes>
