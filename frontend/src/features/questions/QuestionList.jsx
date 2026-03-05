@@ -80,17 +80,17 @@ const QuestionList = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Question Bank</h2>
+                    <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Question Bank</h2>
                     <p className="text-sm text-gray-500 mt-1">Manage and organize all questions</p>
                 </div>
                 {canManage && (
-                    <div className="flex items-center gap-3">
-                        <div className="relative overflow-hidden flex items-center">
-                            <button type="button" className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 border border-gray-300 rounded-lg font-medium shadow-sm transition-colors cursor-pointer relative">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                        <div className="relative overflow-hidden flex items-center flex-1 sm:flex-none">
+                            <button type="button" className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 border border-gray-300 rounded-xl font-bold text-sm shadow-sm transition-all cursor-pointer relative">
                                 <FaUpload />
-                                <span className="hidden sm:inline">Import</span>
+                                <span>Import</span>
                                 <input
                                     type="file"
                                     accept=".json"
@@ -103,35 +103,35 @@ const QuestionList = () => {
 
                         <button
                             onClick={handleExport}
-                            className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 border border-gray-300 rounded-lg font-medium shadow-sm transition-colors"
+                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 border border-gray-300 rounded-xl font-bold text-sm shadow-sm transition-all"
                         >
                             <FaDownload />
-                            <span className="hidden sm:inline">Export</span>
+                            <span>Export</span>
                         </button>
 
                         <Link
                             to="/questions/new"
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-colors"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all transform active:scale-95"
                         >
                             <FaPlus />
-                            <span className="hidden sm:inline">Add Question</span>
+                            <span>Add Question</span>
                         </Link>
                     </div>
                 )}
             </div>
 
             {/* Filters Section */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-                <form onSubmit={handleSearchSubmit} className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 transition-all hover:border-blue-200">
+                <form onSubmit={handleSearchSubmit} className="flex flex-col xl:flex-row gap-6 items-end">
                     <div className="flex-1 w-full">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Search Keywords</label>
+                        <label className="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Search Keywords</label>
                         <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaSearch className="text-gray-400" />
+                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <FaSearch className="text-gray-300" />
                             </div>
                             <input
                                 type="text"
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out"
+                                className="block w-full pl-11 pr-4 py-3 border border-gray-100 rounded-xl leading-5 bg-gray-50/50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 sm:text-sm transition-all"
                                 placeholder="Search by title or tags..."
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
@@ -139,69 +139,74 @@ const QuestionList = () => {
                         </div>
                     </div>
 
-                    <div className="w-full md:w-48">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
-                        <select
-                            name="difficulty"
-                            value={filters.difficulty}
-                            onChange={handleFilterChange}
-                            className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                        >
-                            <option value="">All Difficulties</option>
-                            <option value="Easy">Easy</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Hard">Hard</option>
-                        </select>
-                    </div>
-
-                    <div className="w-full md:w-48">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <input
-                            type="text"
-                            name="category"
-                            value={filters.category}
-                            onChange={handleFilterChange}
-                            placeholder="e.g. Mathematics"
-                            className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
-                    </div>
-
-                    {canManage && (
-                        <div className="w-full md:w-48">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full xl:w-auto">
+                        <div className="w-full">
+                            <label className="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Difficulty</label>
                             <select
-                                name="status"
-                                value={filters.status}
+                                name="difficulty"
+                                value={filters.difficulty}
                                 onChange={handleFilterChange}
-                                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                className="block w-full pl-4 pr-10 py-3 text-sm border-gray-100 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl transition-all appearance-none cursor-pointer"
                             >
-                                <option value="">All Statuses</option>
-                                <option value="Published">Published</option>
-                                <option value="Draft">Draft</option>
+                                <option value="">All Difficulties</option>
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
                             </select>
                         </div>
-                    )}
 
-                    <button
-                        type="submit"
-                        className="w-full md:w-auto px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
-                    >
-                        Search
-                    </button>
+                        <div className="w-full">
+                            <label className="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
+                            <input
+                                type="text"
+                                name="category"
+                                value={filters.category}
+                                onChange={handleFilterChange}
+                                placeholder="e.g. Mathematics"
+                                className="block w-full px-4 py-3 border border-gray-100 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 sm:text-sm rounded-xl transition-all"
+                            />
+                        </div>
 
-                    {(filters.keyword || filters.category || filters.difficulty || filters.status) && (
+                        {canManage && (
+                            <div className="w-full">
+                                <label className="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Status</label>
+                                <select
+                                    name="status"
+                                    value={filters.status}
+                                    onChange={handleFilterChange}
+                                    className="block w-full pl-4 pr-10 py-3 text-sm border-gray-100 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl transition-all appearance-none cursor-pointer"
+                                >
+                                    <option value="">All Statuses</option>
+                                    <option value="Published">Published</option>
+                                    <option value="Draft">Draft</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex gap-2 w-full lg:w-auto">
                         <button
-                            type="button"
-                            onClick={() => {
-                                setFilters({ keyword: '', category: '', difficulty: '', status: '' });
-                                setSearchInput('');
-                                setPage(1);
-                            }}
-                            className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
+                            type="submit"
+                            className="flex-1 lg:flex-none px-8 py-3 bg-gray-900 text-white text-sm font-bold rounded-xl shadow-lg shadow-gray-200 hover:bg-blue-600 hover:shadow-blue-200 transition-all transform active:scale-95"
                         >
-                            Clear
+                            Search
                         </button>
-                    )}
+
+                        {(filters.keyword || filters.category || filters.difficulty || filters.status) && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setFilters({ keyword: '', category: '', difficulty: '', status: '' });
+                                    setSearchInput('');
+                                    setPage(1);
+                                }}
+                                className="p-3 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 transition-colors transform active:scale-95"
+                                title="Clear filters"
+                            >
+                                <FaFilter />
+                            </button>
+                        )}
+                    </div>
                 </form>
             </div>
 
