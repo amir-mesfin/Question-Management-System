@@ -255,47 +255,57 @@ const QuestionList = () => {
                                             )}
                                         </div>
 
-                                        <h4 className="text-lg font-semibold text-gray-900 truncate">
-                                            <Link to={`/questions/${question._id}`} className="hover:text-blue-600 transition">
-                                                {question.title}
-                                            </Link>
-                                        </h4>
+                                        <div className="flex gap-4">
+                                            {question.mediaUrl && (
+                                                <div className="h-16 w-16 mb-2 flex-shrink-0 rounded bg-gray-100 border border-gray-200 overflow-hidden">
+                                                    <img src={question.mediaUrl} alt="thumbnail" className="h-full w-full object-cover" />
+                                                </div>
+                                            )}
 
-                                        <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
-                                            <span>Category: <span className="font-medium text-gray-700">{question.category}</span></span>
-                                            <span className="hidden sm:inline">&bull;</span>
-                                            <span className="hidden sm:inline">Added by {question.createdBy?.name || 'Unknown'}</span>
-                                        </div>
+                                            <div>
+                                                <h4 className="text-lg font-semibold text-gray-900 truncate">
+                                                    <Link to={`/questions/${question._id}`} className="hover:text-blue-600 transition">
+                                                        {question.title}
+                                                    </Link>
+                                                </h4>
 
-                                        {question.tags && question.tags.length > 0 && (
-                                            <div className="mt-2 flex flex-wrap gap-2">
-                                                {question.tags.map((tag, index) => (
-                                                    <span key={index} className="inline-flex text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                                        #{tag}
-                                                    </span>
-                                                ))}
+                                                <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+                                                    <span>Category: <span className="font-medium text-gray-700">{question.category}</span></span>
+                                                    <span className="hidden sm:inline">&bull;</span>
+                                                    <span className="hidden sm:inline">Added by {question.createdBy?.name || 'Unknown'}</span>
+                                                </div>
+
+                                                {question.tags && question.tags.length > 0 && (
+                                                    <div className="mt-2 flex flex-wrap gap-2">
+                                                        {question.tags.map((tag, index) => (
+                                                            <span key={index} className="inline-flex text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                                                #{tag}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
 
-                                    {canManage && (
-                                        <div className="flex items-center gap-2 mt-4 sm:mt-0 self-end sm:self-auto">
-                                            <Link
-                                                to={`/questions/${question._id}/edit`}
-                                                className="p-2 text-gray-400 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 rounded shadow-sm transition"
-                                                title="Edit"
-                                            >
-                                                <FaEdit />
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(question._id)}
-                                                className="p-2 text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-gray-200 rounded shadow-sm transition"
-                                                title="Delete"
-                                            >
-                                                <FaTrash />
-                                            </button>
+                                            {canManage && (
+                                                <div className="flex items-center gap-2 mt-4 sm:mt-0 self-end sm:self-auto">
+                                                    <Link
+                                                        to={`/questions/${question._id}/edit`}
+                                                        className="p-2 text-gray-400 hover:text-blue-600 bg-white hover:bg-blue-50 border border-gray-200 rounded shadow-sm transition"
+                                                        title="Edit"
+                                                    >
+                                                        <FaEdit />
+                                                    </Link>
+                                                    <button
+                                                        onClick={() => handleDelete(question._id)}
+                                                        className="p-2 text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 border border-gray-200 rounded shadow-sm transition"
+                                                        title="Delete"
+                                                    >
+                                                        <FaTrash />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </li>
                         ))}
