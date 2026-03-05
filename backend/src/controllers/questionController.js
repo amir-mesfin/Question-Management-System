@@ -60,9 +60,11 @@ export const getQuestions = async (req, res) => {
         if (category) query.category = category;
         if (difficulty) query.difficulty = difficulty;
 
-        // Only admins/instructors can access the full question bank
+        // Only admins can see everything. Instructors see own. Students are blocked.
         if (req.user.role === 'Student') {
             return res.status(403).json({ message: 'Not authorized to access the question bank' });
+        } else if (req.user.role === 'Instructor') {
+            query.createdBy = req.user._id;
         }
 
         if (status) {

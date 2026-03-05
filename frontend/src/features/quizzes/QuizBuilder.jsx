@@ -18,6 +18,9 @@ const QuizBuilder = () => {
         passingScore: 70,
         timeLimit: 0,
         isPublished: false,
+        maxAttempts: 0,
+        startTime: '',
+        endTime: '',
     });
 
     const [selectedQuestionIds, setSelectedQuestionIds] = useState([]);
@@ -48,6 +51,9 @@ const QuizBuilder = () => {
                 passingScore: quiz.passingScore || 70,
                 timeLimit: quiz.timeLimit || 0,
                 isPublished: quiz.isPublished || false,
+                maxAttempts: quiz.maxAttempts || 0,
+                startTime: quiz.startTime ? new Date(quiz.startTime).toISOString().slice(0, 16) : '',
+                endTime: quiz.endTime ? new Date(quiz.endTime).toISOString().slice(0, 16) : '',
             });
             // Extrac IDs from populated questions array
             const questionIds = quiz.questions?.map(q => typeof q === 'string' ? q : q._id) || [];
@@ -183,7 +189,43 @@ const QuizBuilder = () => {
                                         onChange={handleChange}
                                         className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Set 0 for no limit</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Max Attempts</label>
+                                <input
+                                    type="number"
+                                    name="maxAttempts"
+                                    min="0"
+                                    placeholder="0 for unlimited"
+                                    value={formData.maxAttempts}
+                                    onChange={handleChange}
+                                    className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">Set 0 for unlimited attempts</p>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="startTime"
+                                        value={formData.startTime}
+                                        onChange={handleChange}
+                                        className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="endTime"
+                                        value={formData.endTime}
+                                        onChange={handleChange}
+                                        className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    />
                                 </div>
                             </div>
 
@@ -264,8 +306,8 @@ const QuizBuilder = () => {
                                             key={question._id}
                                             onClick={() => toggleQuestionSelection(question._id)}
                                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${isSelected
-                                                    ? 'border-blue-500 bg-blue-50'
-                                                    : 'border-gray-200 hover:border-blue-300'
+                                                ? 'border-blue-500 bg-blue-50'
+                                                : 'border-gray-200 hover:border-blue-300'
                                                 }`}
                                         >
                                             <div className="flex items-start gap-4">
@@ -284,8 +326,8 @@ const QuizBuilder = () => {
                                                             {question.type}
                                                         </span>
                                                         <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${question.difficulty === 'Easy' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                                question.difficulty === 'Medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                                                    'bg-red-50 text-red-700 border-red-200'
+                                                            question.difficulty === 'Medium' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                                                                'bg-red-50 text-red-700 border-red-200'
                                                             }`}>
                                                             {question.difficulty}
                                                         </span>

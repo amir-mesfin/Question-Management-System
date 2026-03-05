@@ -38,9 +38,11 @@ export const getQuizzes = async (req, res) => {
             query.title = { $regex: keyword, $options: 'i' };
         }
 
-        // Students only see published quizzes
+        // Isolation: Students see published. Instructors see own. Admins see all.
         if (req.user.role === 'Student') {
             query.isPublished = true;
+        } else if (req.user.role === 'Instructor') {
+            query.createdBy = req.user._id;
         } else if (isPublished === 'true' || isPublished === 'false') {
             query.isPublished = isPublished === 'true';
         }
@@ -80,9 +82,29 @@ export const getQuizById = async (req, res) => {
             return res.status(404).json({ message: 'Quiz not found' });
         }
 
-        // Students cannot view unpublished quizzes
-        if (req.user.role === 'Student' && !quiz.isPublished) {
-            return res.status(403).json({ message: 'You are not authorized to view this quiz' });
+        // Restriction: Time Windows
+        const now = new Date();
+        if (quiz.startTime && now < quiz.startTime) {
+            return res.status(403).json({ message: `This quiz is not available until ${quiz.startTime.toLocaleString()}` });
+        }
+        if (quiz.endTime && now > quiz.endTime) {
+            return res.status(403).json({ message: 'This quiz has expired' });
+        }
+
+        // Restriction: Allowed Students
+        if (quiz.allowedStudents && quiz.allowedStudents.length > 0) {
+            const isAllowed = quiz.allowedStudents.some(id => id.toString() === req.user._id.toString());
+            if (!isAllowed) {
+                return res.status(403).json({ message: 'You are not in the list of allowed students for this quiz' });
+            }
+        }
+
+        // Restriction: Max Attempts
+        if (quiz.maxAttempts > 0) {
+            const attemptCount = await Attempt.countDocuments({ user: req.user._id, quiz: quiz._id });
+            if (attemptCount >= quiz.maxAttempts) {
+                return res.status(403).json({ message: `You have reached the maximum limit of ${quiz.maxAttempts} attempts for this quiz` });
+            }
         }
 
         res.json(quiz);
@@ -153,6 +175,28 @@ export const submitQuiz = async (req, res) => {
 
         if (!quiz) {
             return res.status(404).json({ message: 'Quiz not found' });
+        }
+
+        // Re-enforce restrictions on submission (security)
+        const now = new Date();
+        if (quiz.startTime && now < quiz.startTime) {
+            return res.status(403).json({ message: 'Quiz is not yet available' });
+        }
+        if (quiz.endTime && now > quiz.endTime) {
+            return res.status(403).json({ message: 'Quiz window has closed' });
+        }
+
+        if (quiz.allowedStudents && quiz.allowedStudents.length > 0) {
+            if (!quiz.allowedStudents.some(id => id.toString() === req.user._id.toString())) {
+                return res.status(403).json({ message: 'You are not authorized to take this quiz' });
+            }
+        }
+
+        if (quiz.maxAttempts > 0) {
+            const attemptCount = await Attempt.countDocuments({ user: req.user._id, quiz: quiz._id });
+            if (attemptCount >= quiz.maxAttempts) {
+                return res.status(403).json({ message: 'Maximum attempts reached for this quiz' });
+            }
         }
 
         let score = 0;

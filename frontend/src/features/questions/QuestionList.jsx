@@ -269,9 +269,13 @@ const QuestionList = () => {
 
                                             <div>
                                                 <h4 className="text-lg font-semibold text-gray-900 truncate">
-                                                    <Link to={`/questions/${question._id}`} className="hover:text-blue-600 transition">
-                                                        {question.title}
-                                                    </Link>
+                                                    {canManage ? (
+                                                        <Link to={`/questions/${question._id}/edit`} className="hover:text-blue-600 transition">
+                                                            {question.title}
+                                                        </Link>
+                                                    ) : (
+                                                        <span>{question.title}</span>
+                                                    )}
                                                 </h4>
 
                                                 <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">

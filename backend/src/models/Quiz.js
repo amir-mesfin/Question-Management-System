@@ -29,6 +29,22 @@ const quizSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        allowedStudents: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            }
+        ],
+        maxAttempts: {
+            type: Number,
+            default: 0, // 0 means unlimited
+        },
+        startTime: {
+            type: Date,
+        },
+        endTime: {
+            type: Date,
+        },
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

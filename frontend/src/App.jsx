@@ -31,7 +31,7 @@ function App() {
           {user && (
             <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-600">
               <Link to="/" className="hover:text-blue-600 transition">Dashboard</Link>
-              {user.role !== 'Student' && <Link to="/questions" className="hover:text-blue-600 transition">Questions</Link>}
+              <Link to="/questions" className="hover:text-blue-600 transition">Questions</Link>
               <Link to="/quizzes" className="hover:text-blue-600 transition">Quizzes</Link>
               {user.role === 'Student' && <Link to="/history" className="hover:text-blue-600 transition">My History</Link>}
               {user.role === 'Admin' && <Link to="/admin/users" className="hover:text-blue-600 transition">Users</Link>}
@@ -83,11 +83,9 @@ function App() {
             <Link to="/" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
               <span>Dashboard</span>
             </Link>
-            {user.role !== 'Student' && (
-              <Link to="/questions" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
-                <span>Questions</span>
-              </Link>
-            )}
+            <Link to="/questions" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
+              <span>Questions</span>
+            </Link>
             <Link to="/quizzes" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
               <span>Quizzes</span>
             </Link>
@@ -117,7 +115,7 @@ function App() {
               )
             }
           />
-          <Route path="/questions" element={user && user.role !== 'Student' ? <QuestionList /> : <Navigate to="/quizzes" />} />
+          <Route path="/questions" element={user ? <QuestionList /> : <Navigate to="/login" />} />
           <Route path="/questions/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
           <Route path="/questions/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
 
