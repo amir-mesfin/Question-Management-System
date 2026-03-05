@@ -18,7 +18,7 @@ export const registerUser = async (req, res) => {
             name,
             email,
             password,
-            role: role || 'Student',
+            role: 'Student', // Always default to Student for public registration
         });
 
         if (user) {

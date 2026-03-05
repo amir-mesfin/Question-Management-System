@@ -8,20 +8,26 @@ const Register = () => {
         name: '',
         email: '',
         password: '',
-        role: 'Student', // default
+        confirmPassword: '',
     });
 
     const navigate = useNavigate();
     const { register, isLoading, error, clearError } = useAuthStore();
+    const [localError, setLocalError] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setLocalError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (formData.password !== formData.confirmPassword) {
+            setLocalError('Passwords do not match');
+            return;
+        }
         try {
-            await register(formData.name, formData.email, formData.password, formData.role);
+            await register(formData.name, formData.email, formData.password, 'Student');
             navigate('/');
         } catch (err) {
             // Error handled in store
@@ -36,10 +42,10 @@ const Register = () => {
                     <p className="text-gray-500">Join the Question Management System</p>
                 </div>
 
-                {error && (
-                    <div className="bg-red-50 text-red-500 p-3 rounded-md mb-6 text-sm flex justify-between items-center">
-                        <span>{error}</span>
-                        <button onClick={clearError} className="font-bold">&times;</button>
+                {(error || localError) && (
+                    <div className="bg-red-50 text-red-500 p-3 rounded-md mb-6 text-sm flex justify-between items-center border border-red-100">
+                        <span>{error || localError}</span>
+                        <button onClick={() => { clearError(); setLocalError(''); }} className="font-bold">&times;</button>
                     </div>
                 )}
 
@@ -80,41 +86,42 @@ const Register = () => {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaLock className="text-gray-400" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <FaLock size={14} className="text-gray-400" />
+                                </div>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    required
+                                    minLength="6"
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-100 bg-gray-50/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"
+                                    placeholder="••••••••"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                />
                             </div>
-                            <input
-                                type="password"
-                                name="password"
-                                required
-                                minLength="6"
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                placeholder="Min 6 characters"
-                                value={formData.password}
-                                onChange={handleChange}
-                            />
                         </div>
-                    </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaUserTag className="text-gray-400" />
+                        <div>
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Confirm</label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <FaLock size={14} className="text-gray-400" />
+                                </div>
+                                <input
+                                    type="password"
+                                    name="confirmPassword"
+                                    required
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-100 bg-gray-50/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm"
+                                    placeholder="••••••••"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                />
                             </div>
-                            <select
-                                name="role"
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white"
-                                value={formData.role}
-                                onChange={handleChange}
-                            >
-                                <option value="Student">Student</option>
-                                <option value="Instructor">Instructor</option>
-                                <option value="Admin">Admin</option>
-                            </select>
                         </div>
                     </div>
 
