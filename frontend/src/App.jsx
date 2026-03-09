@@ -13,6 +13,7 @@ import QuizHistory from './features/quizzes/QuizHistory';
 import QuizStats from './features/quizzes/QuizStats';
 import UserManagement from './features/admin/UserManagement';
 import Dashboard from './features/dashboard/Dashboard';
+import QuestionDetail from './features/questions/QuestionDetail';
 
 function App() {
   const { user, logout } = useAuthStore();
@@ -117,6 +118,7 @@ function App() {
           />
           <Route path="/questions" element={user ? <QuestionList /> : <Navigate to="/login" />} />
           <Route path="/questions/new" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
+          <Route path="/questions/:id" element={user ? <QuestionDetail /> : <Navigate to="/login" />} />
           <Route path="/questions/:id/edit" element={user && (user.role === 'Admin' || user.role === 'Instructor') ? <QuestionForm /> : <Navigate to="/questions" />} />
 
           {/* Quiz Routes */}

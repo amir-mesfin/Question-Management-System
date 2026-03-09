@@ -21,7 +21,7 @@ const MathText = ({ text, className = '' }) => {
         <div 
             ref={containerRef} 
             className={`math-container ${className}`}
-            dangerouslySetInnerHTML={{ __html: text.replace(/\n/g, '<br/>') }}
+            dangerouslySetInnerHTML={{ __html: (text || '').replace(/\n/g, '<br/>') }}
         />
     );
 };

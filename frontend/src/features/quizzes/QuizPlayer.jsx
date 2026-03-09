@@ -127,27 +127,49 @@ const QuizPlayer = () => {
                     </div>
                     <ul className="divide-y divide-gray-50">
                         {results.results.map((res, idx) => (
-                            <li key={idx} className="p-6">
-                                <div className="font-bold text-gray-900 mb-3 flex gap-2">
-                                    <span>{idx + 1}.</span>
-                                    <MathText text={res.title} />
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                    <div className={`p-3 rounded-xl border ${res.isCorrect ? 'bg-green-50 border-green-100 text-green-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
-                                        <span className="block font-bold mb-1 opacity-60">Your Answer:</span>
-                                        {res.userAnswer ? <MathText text={res.userAnswer} /> : <span className="italic">No answer provided</span>}
+                            <li key={idx} className="p-8 space-y-4">
+                                <div className="flex gap-4">
+                                    <span className="shrink-0 w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-black text-gray-500">{idx + 1}</span>
+                                    <div className="text-xl font-bold text-gray-900 leading-tight">
+                                        <MathText text={res.title} />
                                     </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className={`p-5 rounded-2xl border-2 ${res.isCorrect ? 'bg-green-50/50 border-green-200' : 'bg-red-50/50 border-red-200'}`}>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            {res.isCorrect ? <FaCheckCircle className="text-green-500" /> : <FaTimesCircle className="text-red-500" />}
+                                            <span className={`text-[10px] font-black uppercase tracking-widest ${res.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                                Your Answer
+                                            </span>
+                                        </div>
+                                        <div className="text-gray-900 font-bold">
+                                            {res.userAnswer ? <MathText text={res.userAnswer} /> : <span className="italic text-gray-400">No answer provided</span>}
+                                        </div>
+                                    </div>
+
                                     {!res.isCorrect && (
-                                        <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-800">
-                                            <span className="block font-bold mb-1 opacity-60">Correct Answer:</span>
-                                            <MathText text={res.correctAnswer} />
+                                        <div className="p-5 bg-gray-50 border-2 border-gray-100 rounded-2xl">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">
+                                                    Correct Answer
+                                                </span>
+                                            </div>
+                                            <div className="text-gray-900 font-bold">
+                                                <MathText text={res.correctAnswer} />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
+
                                 {res.explanation && (
-                                    <div className="mt-4 text-sm text-gray-500 italic bg-blue-50/30 p-3 rounded-lg border border-blue-100/30">
-                                        <span className="font-bold mr-2 text-blue-600 NOT-ITALIC">Explanation:</span>
-                                        <MathText text={res.explanation} />
+                                    <div className="p-5 bg-blue-50/30 rounded-2xl border border-blue-100/50 relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-1 h-full bg-blue-500" />
+                                        <span className="block text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">Expert Explanation</span>
+                                        <div className="text-gray-700 text-sm leading-relaxed italic">
+                                            <MathText text={res.explanation} />
+                                        </div>
                                     </div>
                                 )}
                             </li>
@@ -196,34 +218,55 @@ const QuizPlayer = () => {
 
             {/* Question Card */}
             <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-                <div className="p-8 sm:p-12">
-                    <div className="text-2xl font-bold text-gray-900 mb-8 leading-tight">
-                        <MathText text={currentQuestion?.title || ""} />
+                <div className="p-8 sm:p-12 space-y-8">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                                currentQuestion?.difficulty === 'Easy' ? 'bg-green-100 text-green-700 border border-green-200' :
+                                currentQuestion?.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : 
+                                'bg-red-100 text-red-700 border border-red-200'
+                            }`}>
+                                {currentQuestion?.difficulty}
+                            </span>
+                            <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider border border-blue-100">
+                                {currentQuestion?.category}
+                            </span>
+                        </div>
+                        
+                        <div className="text-3xl font-black text-gray-900 leading-tight">
+                            <MathText text={currentQuestion?.title || ""} />
+                        </div>
                     </div>
 
                     {currentQuestion?.mediaUrl && (
-                        <div className="mb-8 rounded-2xl overflow-hidden border border-gray-100">
-                            <img src={currentQuestion.mediaUrl} alt="Question Media" className="w-full object-cover max-h-80" />
+                        <div className="rounded-3xl overflow-hidden border border-gray-100 shadow-inner">
+                            <img src={currentQuestion.mediaUrl} alt="Question Media" className="w-full object-cover max-h-[400px]" />
                         </div>
                     )}
 
-                    {currentQuestion?.type === 'MCQ' || currentQuestion?.type === 'Multiple Choice' ? (
+                    {(currentQuestion?.type === 'MCQ' || currentQuestion?.type === 'Multiple Choice' || currentQuestion?.type === 'True/False') ? (
                         <div className="grid grid-cols-1 gap-4">
                             {currentQuestion.options.map((option, idx) => (
                                 <button
                                     key={idx}
-                                    onClick={() => handleAnswerChange(option)}
-                                    className={`w-full text-left p-6 rounded-2xl border-2 transition-all font-bold ${currentAnswer === option
-                                            ? 'bg-blue-50 border-blue-600 text-blue-900 shadow-md shadow-blue-50 scale-[1.02]'
-                                            : 'bg-white border-gray-100 text-gray-700 hover:border-gray-200 hover:bg-gray-50 active:scale-98'
+                                    onClick={() => handleAnswerChange(option.text)}
+                                    className={`group w-full text-left p-6 rounded-2xl border-2 transition-all duration-300 ${currentAnswer === option.text
+                                            ? 'bg-blue-50/50 border-blue-600 shadow-lg shadow-blue-50 scale-[1.01]'
+                                            : 'bg-white border-gray-100 hover:border-blue-200 hover:bg-gray-50/50 active:scale-[0.99]'
                                         }`}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${currentAnswer === option ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                                            {String.fromCharCode(65 + idx)}
-                                        </span>
-                                        <div className="flex-1">
-                                            <MathText text={option} />
+                                    <div className="flex items-center gap-5">
+                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                                            currentAnswer === option.text ? 'border-blue-600 bg-blue-600' : 'border-gray-200 group-hover:border-blue-400'
+                                        }`}>
+                                            <div className={`w-2 h-2 rounded-full bg-white transition-transform duration-300 ${
+                                                currentAnswer === option.text ? 'scale-100' : 'scale-0'
+                                            }`} />
+                                        </div>
+                                        <div className={`flex-1 text-lg font-bold transition-colors ${
+                                            currentAnswer === option.text ? 'text-blue-900' : 'text-gray-700'
+                                        }`}>
+                                            <MathText text={option.text} />
                                         </div>
                                     </div>
                                 </button>
@@ -231,13 +274,19 @@ const QuizPlayer = () => {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest pl-1">Type your answer below</label>
+                            <h4 className="flex items-center gap-2 text-sm font-black text-gray-400 uppercase tracking-widest px-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                {currentQuestion?.type === 'Essay' ? 'Write your essay below' : 'Type your answer below'}
+                            </h4>
                             <textarea
-                                className="w-full p-6 border-2 border-gray-100 rounded-3xl focus:border-blue-500 focus:ring-0 text-gray-900 font-medium bg-gray-50/50 min-h-[160px] transition-all"
-                                placeholder="Your answer..."
+                                className="w-full p-8 border-2 border-gray-100 rounded-[2rem] focus:border-blue-500 focus:ring-0 text-xl text-gray-900 font-bold bg-gray-50/30 min-h-[250px] transition-all placeholder:text-gray-200"
+                                placeholder={currentQuestion?.type === 'Essay' ? "Start typing your response here..." : "Type the missing word or phrase..."}
                                 value={currentAnswer}
                                 onChange={(e) => handleAnswerChange(e.target.value)}
                             ></textarea>
+                            {currentQuestion?.type === 'Essay' && (
+                                <p className="text-xs text-gray-400 font-bold px-2 italic text-center">Your essay will be saved automatically as you type.</p>
+                            )}
                         </div>
                     )}
                 </div>
