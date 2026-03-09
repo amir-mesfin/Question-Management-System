@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaDownload, FaUpload } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
 import useAuthStore from '../../store/authStore';
+import MathText from '../../components/MathText';
 
 const QuestionList = () => {
     const { questions, isLoading, error, fetchQuestions, deleteQuestion, pagination, exportQuestions, importQuestions } = useQuestionStore();
@@ -239,7 +240,7 @@ const QuestionList = () => {
                 <div className="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden flex flex-col">
                     <ul className="divide-y divide-gray-200">
                         {questions.map((question) => (
-                            <li key={question._id} className="p-4 sm:p-6 hover:bg-gray-50 transition duration-150">
+                            <li key={question._id} className="group p-4 sm:p-6 hover:bg-blue-50/30 transition-all duration-300 border-l-4 border-transparent hover:border-blue-500">
                                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-1">
@@ -268,13 +269,13 @@ const QuestionList = () => {
                                             )}
 
                                             <div>
-                                                <h4 className="text-lg font-semibold text-gray-900 truncate">
+                                                <h4 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                                                     {canManage ? (
-                                                        <Link to={`/questions/${question._id}/edit`} className="hover:text-blue-600 transition">
-                                                            {question.title}
+                                                        <Link to={`/questions/${question._id}/edit`}>
+                                                            <MathText text={question.title} />
                                                         </Link>
                                                     ) : (
-                                                        <span>{question.title}</span>
+                                                        <MathText text={question.title} />
                                                     )}
                                                 </h4>
 

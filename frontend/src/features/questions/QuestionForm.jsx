@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaExclamationCircle, FaImage, FaSpinner } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
+import MathText from '../../components/MathText';
 
 const QuestionForm = () => {
     const { id } = useParams();
@@ -382,6 +383,72 @@ const QuestionForm = () => {
                                             disabled={isUploading}
                                         />
                                     </label>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Premium Live Preview Section */}
+                    <div className="bg-blue-50/30 rounded-2xl border border-blue-100 p-6 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-extrabold text-blue-600 uppercase tracking-widest">Premium Live Preview</h3>
+                            <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded font-bold">REAL-TIME</span>
+                        </div>
+                        
+                        <div className="bg-white rounded-xl shadow-sm border border-blue-50 p-6 space-y-4">
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                        formData.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
+                                        formData.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                                    }`}>
+                                        {formData.difficulty}
+                                    </span>
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase">{formData.type}</span>
+                                </div>
+                                <div className="text-xl font-bold text-gray-900 leading-tight">
+                                    {formData.title ? <MathText text={formData.title} /> : <span className="text-gray-300 italic">Question title will appear here...</span>}
+                                </div>
+                            </div>
+
+                            {formData.mediaUrl && (
+                                <div className="rounded-lg overflow-hidden border border-gray-100">
+                                    <img src={formData.mediaUrl} alt="Preview" className="w-full max-h-64 object-cover" />
+                                </div>
+                            )}
+
+                            {(formData.type === 'MCQ' || formData.type === 'True/False') && (
+                                <div className="grid grid-cols-1 gap-3">
+                                    {formData.options.map((opt, i) => (
+                                        <div key={i} className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                                            opt.isCorrect ? 'bg-green-50 border-green-200 shadow-sm' : 'bg-gray-50 border-gray-100'
+                                        }`}>
+                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                                                opt.isCorrect ? 'bg-green-500 text-white' : 'bg-white border border-gray-300 text-gray-400'
+                                            }`}>
+                                                {String.fromCharCode(65 + i)}
+                                            </div>
+                                            <div className={`flex-1 text-sm ${opt.isCorrect ? 'text-green-800 font-medium' : 'text-gray-600'}`}>
+                                                {formData.type === 'True/False' ? (i === 0 ? 'True' : 'False') : (opt.text ? <MathText text={opt.text} /> : <span className="text-gray-300 italic">Option {i+1} text...</span>)}
+                                            </div>
+                                            {opt.isCorrect && <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {formData.type === 'Fill-in-the-Blank' && (
+                                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 text-sm italic text-blue-700">
+                                    Correct answer: <span className="font-bold underline">{formData.correctAnswerText || '...'}</span>
+                                </div>
+                            )}
+
+                            {formData.explanation && (
+                                <div className="pt-4 border-t border-gray-100">
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2">Explanation</label>
+                                    <div className="text-sm text-gray-600 italic bg-gray-50 p-3 rounded-lg leading-relaxed">
+                                        <MathText text={formData.explanation} />
+                                    </div>
                                 </div>
                             )}
                         </div>

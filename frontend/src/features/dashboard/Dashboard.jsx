@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaQuestionCircle, FaLayerGroup, FaUsers, FaPlus, FaChevronRight, FaClock } from 'react-icons/fa';
 import useDashboardStore from '../../store/dashboardStore';
 import useAuthStore from '../../store/authStore';
+import MathText from '../../components/MathText';
 
 const Dashboard = () => {
     const { stats, distribution, activity, isLoading, fetchStats, fetchDistribution, fetchRecentActivity } = useDashboardStore();
@@ -124,7 +125,10 @@ const Dashboard = () => {
                                         <FaPlus className="text-green-500" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-gray-900">New question added: <span className="font-bold underline">{q.title}</span></p>
+                                        <div className="text-sm font-medium text-gray-900 flex gap-1">
+                                            <span>New question added:</span>
+                                            <span className="font-bold underline">{q.title ? <MathText text={q.title} /> : 'Unknown'}</span>
+                                        </div>
                                         <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
                                             <FaClock />
                                             <span>{new Date(q.createdAt).toLocaleDateString()}</span>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaCheckCircle, FaTimesCircle, FaClock, FaRedo, FaHome } from 'react-icons/fa';
 import useQuizStore from '../../store/quizStore';
+import MathText from '../../components/MathText';
 
 const QuizPlayer = () => {
     const { id } = useParams();
@@ -127,23 +128,26 @@ const QuizPlayer = () => {
                     <ul className="divide-y divide-gray-50">
                         {results.results.map((res, idx) => (
                             <li key={idx} className="p-6">
-                                <p className="font-bold text-gray-900 mb-3">{idx + 1}. {res.title}</p>
+                                <div className="font-bold text-gray-900 mb-3 flex gap-2">
+                                    <span>{idx + 1}.</span>
+                                    <MathText text={res.title} />
+                                </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                     <div className={`p-3 rounded-xl border ${res.isCorrect ? 'bg-green-50 border-green-100 text-green-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
                                         <span className="block font-bold mb-1 opacity-60">Your Answer:</span>
-                                        {res.userAnswer || <span className="italic">No answer provided</span>}
+                                        {res.userAnswer ? <MathText text={res.userAnswer} /> : <span className="italic">No answer provided</span>}
                                     </div>
                                     {!res.isCorrect && (
                                         <div className="p-3 bg-gray-50 border border-gray-100 rounded-xl text-gray-800">
                                             <span className="block font-bold mb-1 opacity-60">Correct Answer:</span>
-                                            {res.correctAnswer}
+                                            <MathText text={res.correctAnswer} />
                                         </div>
                                     )}
                                 </div>
                                 {res.explanation && (
                                     <div className="mt-4 text-sm text-gray-500 italic bg-blue-50/30 p-3 rounded-lg border border-blue-100/30">
                                         <span className="font-bold mr-2 text-blue-600 NOT-ITALIC">Explanation:</span>
-                                        {res.explanation}
+                                        <MathText text={res.explanation} />
                                     </div>
                                 )}
                             </li>
@@ -193,7 +197,9 @@ const QuizPlayer = () => {
             {/* Question Card */}
             <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
                 <div className="p-8 sm:p-12">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-8 leading-tight">{currentQuestion?.title}</h3>
+                    <div className="text-2xl font-bold text-gray-900 mb-8 leading-tight">
+                        <MathText text={currentQuestion?.title || ""} />
+                    </div>
 
                     {currentQuestion?.mediaUrl && (
                         <div className="mb-8 rounded-2xl overflow-hidden border border-gray-100">
@@ -201,7 +207,7 @@ const QuizPlayer = () => {
                         </div>
                     )}
 
-                    {currentQuestion?.type === 'Multiple Choice' ? (
+                    {currentQuestion?.type === 'MCQ' || currentQuestion?.type === 'Multiple Choice' ? (
                         <div className="grid grid-cols-1 gap-4">
                             {currentQuestion.options.map((option, idx) => (
                                 <button
@@ -213,10 +219,12 @@ const QuizPlayer = () => {
                                         }`}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${currentAnswer === option ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                        <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${currentAnswer === option ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
                                             {String.fromCharCode(65 + idx)}
                                         </span>
-                                        {option}
+                                        <div className="flex-1">
+                                            <MathText text={option} />
+                                        </div>
                                     </div>
                                 </button>
                             ))}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { FaHistory, FaCheckCircle, FaTimesCircle, FaChevronRight, FaCalendarAlt, FaAward } from 'react-icons/fa';
 import api from '../../services/api';
 import { Link } from 'react-router-dom';
+import MathText from '../../components/MathText';
 
 const QuizHistory = () => {
     const [attempts, setAttempts] = useState([]);
@@ -76,7 +77,9 @@ const QuizHistory = () => {
                                     {attempt.passed ? <FaCheckCircle size={24} /> : <FaTimesCircle size={24} />}
                                 </div>
                                 <div className="min-w-0">
-                                    <h4 className="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition">{attempt.quiz?.title || 'Deleted Quiz'}</h4>
+                                    <h4 className="text-lg font-bold text-gray-900 truncate group-hover:text-blue-600 transition">
+                                        {attempt.quiz?.title ? <MathText text={attempt.quiz.title} /> : 'Deleted Quiz'}
+                                    </h4>
                                     <div className="flex items-center gap-4 mt-1 text-xs font-bold text-gray-400 uppercase tracking-widest">
                                         <span className="flex items-center gap-1.5"><FaCalendarAlt /> {new Date(attempt.createdAt).toLocaleDateString()}</span>
                                         <span className="flex items-center gap-1.5"><FaAward /> {attempt.passed ? 'PASSED' : 'FAILED'}</span>
