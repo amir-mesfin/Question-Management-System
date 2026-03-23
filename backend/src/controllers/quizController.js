@@ -205,7 +205,24 @@ export const submitQuiz = async (req, res) => {
 
         quiz.questions.forEach((question) => {
             const userAnswer = answers.find(a => a.questionId === question._id.toString());
-            const isCorrect = userAnswer && userAnswer.answerText === question.correctAnswerText;
+            
+            let isCorrect = false;
+            let actualCorrectAnswer = question.correctAnswerText || '';
+
+            if (question.type === 'MCQ' || question.type === 'True/False') {
+                const correctOption = question.options.find(opt => opt.isCorrect);
+                if (correctOption) {
+                    actualCorrectAnswer = correctOption.text;
+                }
+                isCorrect = userAnswer && userAnswer.answerText === actualCorrectAnswer;
+            } else {
+                // For Fill-in-the-Blank, we might want case-insensitive comparison
+                if (userAnswer && userAnswer.answerText && question.correctAnswerText) {
+                    isCorrect = userAnswer.answerText.trim().toLowerCase() === question.correctAnswerText.trim().toLowerCase();
+                } else {
+                    isCorrect = false;
+                }
+            }
 
             if (isCorrect) {
                 score++;
@@ -215,7 +232,7 @@ export const submitQuiz = async (req, res) => {
                 questionId: question._id,
                 title: question.title,
                 userAnswer: userAnswer ? userAnswer.answerText : null,
-                correctAnswer: question.correctAnswerText,
+                correctAnswer: actualCorrectAnswer,
                 isCorrect,
                 explanation: question.explanation
             });

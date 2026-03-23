@@ -11,6 +11,7 @@ const QuizPlayer = () => {
 
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState([]);
+    const [checkedQuestions, setCheckedQuestions] = useState({});
     const [isFinished, setIsFinished] = useState(false);
     const [results, setResults] = useState(null);
     const [timeLeft, setTimeLeft] = useState(null);
@@ -60,6 +61,35 @@ const QuizPlayer = () => {
         if (currentQuestionIndex > 0) {
             setCurrentQuestionIndex(prev => prev - 1);
         }
+    };
+
+    const handleCheckAnswer = () => {
+        const currentQuestion = quiz.questions[currentQuestionIndex];
+        const currentAnswer = answers.find(a => a.questionId === currentQuestion._id)?.answerText;
+        if (!currentAnswer) return;
+
+        let isCorrect = false;
+        let correctAnswerText = currentQuestion.correctAnswerText || '';
+
+        if (currentQuestion.type === 'MCQ' || currentQuestion.type === 'True/False') {
+            const correctOption = currentQuestion.options.find(opt => opt.isCorrect);
+            if (correctOption) {
+                correctAnswerText = correctOption.text;
+                isCorrect = currentAnswer === correctOption.text;
+            }
+        } else {
+            if (currentAnswer && currentQuestion.correctAnswerText) {
+                isCorrect = currentAnswer.trim().toLowerCase() === currentQuestion.correctAnswerText.trim().toLowerCase();
+            }
+        }
+
+        setCheckedQuestions(prev => ({
+            ...prev,
+            [currentQuestion._id]: {
+                isCorrect,
+                correctAnswerText
+            }
+        }));
     };
 
     const handleFinish = async () => {
@@ -289,6 +319,33 @@ const QuizPlayer = () => {
                             )}
                         </div>
                     )}
+                    {checkedQuestions[currentQuestion?._id] && (
+                        <div className={`mt-8 p-6 rounded-2xl border-2 ${checkedQuestions[currentQuestion._id].isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                            <div className="flex items-center gap-3 mb-4">
+                                {checkedQuestions[currentQuestion._id].isCorrect ? (
+                                    <FaCheckCircle className="text-2xl text-green-500" />
+                                ) : (
+                                    <FaTimesCircle className="text-2xl text-red-500" />
+                                )}
+                                <h4 className={`text-xl font-bold ${checkedQuestions[currentQuestion._id].isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+                                    {checkedQuestions[currentQuestion._id].isCorrect ? 'Correct!' : 'Incorrect'}
+                                </h4>
+                            </div>
+                            {!checkedQuestions[currentQuestion._id].isCorrect && (
+                                <div className="mt-4">
+                                    <span className="text-xs font-black uppercase tracking-widest text-gray-500">Correct Answer:</span>
+                                    <div className="text-gray-900 font-bold mt-1 text-lg">
+                                        <MathText text={checkedQuestions[currentQuestion._id].correctAnswerText} />
+                                    </div>
+                                </div>
+                            )}
+                            {currentQuestion?.explanation && (
+                                <div className="mt-4 p-4 bg-white/60 rounded-xl text-sm text-gray-700 italic border border-gray-100/50">
+                                    <MathText text={currentQuestion.explanation} />
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer Navigation */}
@@ -301,21 +358,32 @@ const QuizPlayer = () => {
                         <FaChevronLeft /> Previous
                     </button>
 
-                    {currentQuestionIndex === quiz.questions.length - 1 ? (
-                        <button
-                            onClick={handleFinish}
-                            className="bg-gray-900 text-white px-12 py-3 rounded-2xl font-black text-lg shadow-lg hover:bg-blue-600 active:scale-95 transition-all"
-                        >
-                            Finish Quiz
-                        </button>
-                    ) : (
-                        <button
-                            onClick={handleNext}
-                            className="flex items-center gap-2 bg-white text-blue-600 border border-blue-200 px-8 py-3 rounded-2xl font-bold shadow-sm hover:bg-blue-50 active:scale-95 transition-all"
-                        >
-                            Next <FaChevronRight />
-                        </button>
-                    )}
+                    <div className="flex flex-wrap justify-end gap-3">
+                        {!checkedQuestions[currentQuestion?._id] && currentQuestion?.type !== 'Essay' && (
+                            <button
+                                onClick={handleCheckAnswer}
+                                disabled={!currentAnswer}
+                                className="bg-blue-100 text-blue-700 px-6 py-3 rounded-2xl font-bold shadow-sm hover:bg-blue-200 active:scale-95 transition-all disabled:opacity-50"
+                            >
+                                Check Answer
+                            </button>
+                        )}
+                        {currentQuestionIndex === quiz.questions.length - 1 ? (
+                            <button
+                                onClick={handleFinish}
+                                className="bg-gray-900 text-white px-8 sm:px-12 py-3 rounded-2xl font-black text-lg shadow-lg hover:bg-blue-600 active:scale-95 transition-all"
+                            >
+                                Finish Quiz
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleNext}
+                                className="flex items-center gap-2 bg-white text-blue-600 border border-blue-200 px-8 py-3 rounded-2xl font-bold shadow-sm hover:bg-blue-50 active:scale-95 transition-all"
+                            >
+                                Next <FaChevronRight />
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
