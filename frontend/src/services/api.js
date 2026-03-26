@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'https://question-management-system.onrender.com/api' || 'http://localhost:5000/api',
 });
 
 // Add a request interceptor to add the auth token to headers
