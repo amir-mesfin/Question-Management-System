@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaExclamationCircle, FaImage, FaSpinner } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
+import useSubjectStore from '../../store/subjectStore';
 import MathText from '../../components/MathText';
 
 const QuestionForm = () => {
@@ -10,12 +11,13 @@ const QuestionForm = () => {
     const isEditMode = !!id;
 
     const { createQuestion, updateQuestion, fetchQuestionById, question: editingQuestion, isLoading, uploadImage, isUploading } = useQuestionStore();
+    const { subjects, fetchSubjects } = useSubjectStore();
 
     const [formData, setFormData] = useState({
         title: '',
         type: 'MCQ',
         difficulty: 'Medium',
-        category: '',
+        subject: '',
         tags: '',
         status: 'Published',
         correctAnswerText: '',
@@ -34,7 +36,8 @@ const QuestionForm = () => {
             }
         };
         loadQuestion();
-    }, [id, isEditMode, fetchQuestionById]);
+        fetchSubjects();
+    }, [id, isEditMode, fetchQuestionById, fetchSubjects]);
 
     useEffect(() => {
         if (isEditMode && editingQuestion) {
@@ -42,7 +45,7 @@ const QuestionForm = () => {
                 title: editingQuestion.title || '',
                 type: editingQuestion.type || 'MCQ',
                 difficulty: editingQuestion.difficulty || 'Medium',
-                category: editingQuestion.category || '',
+                subject: editingQuestion.subject?._id || editingQuestion.subject || '',
                 tags: editingQuestion.tags?.join(', ') || '',
                 status: editingQuestion.status || 'Published',
                 correctAnswerText: editingQuestion.correctAnswerText || '',
@@ -59,6 +62,18 @@ const QuestionForm = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleQuickCreateSubject = async () => {
+        const name = window.prompt("Enter new subject name:");
+        if (name && name.trim()) {
+            try {
+                const newSubj = await useSubjectStore.getState().createSubject({ name });
+                setFormData(prev => ({ ...prev, subject: newSubj._id }));
+            } catch (err) {
+                alert("Error creating subject. It might already exist.");
+            }
+        }
     };
 
     const handleImageUpload = async (e) => {
@@ -215,16 +230,29 @@ const QuestionForm = () => {
 
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Category / Subject <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    name="category"
-                                    required
-                                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                    placeholder="e.g., Mathematics, History"
-                                    value={formData.category}
-                                    onChange={handleChange}
-                                />
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Subject <span className="text-red-500">*</span></label>
+                                <div className="flex gap-2">
+                                    <select
+                                        name="subject"
+                                        required
+                                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-white"
+                                        value={formData.subject}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="" disabled>Select a subject</option>
+                                        {subjects.map(s => (
+                                            <option key={s._id} value={s._id}>{s.name} {s.parentSubjectId ? `(Sub)` : ''}</option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        type="button"
+                                        onClick={handleQuickCreateSubject}
+                                        className="px-3 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 transition"
+                                        title="Quick Create Subject"
+                                    >
+                                        <FaPlus />
+                                    </button>
+                                </div>
                             </div>
 
                             <div>

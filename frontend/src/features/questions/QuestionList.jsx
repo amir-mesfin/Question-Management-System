@@ -1,19 +1,23 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaDownload, FaUpload } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
+import useSubjectStore from '../../store/subjectStore';
 import useAuthStore from '../../store/authStore';
 import MathText from '../../components/MathText';
 
 const QuestionList = () => {
     const { questions, isLoading, error, fetchQuestions, deleteQuestion, pagination, exportQuestions, importQuestions } = useQuestionStore();
+    const { subjects, fetchSubjects } = useSubjectStore();
     const { user } = useAuthStore();
+    const [searchParams] = useSearchParams();
+    const initialSubjectId = searchParams.get('subject') || '';
 
     const canManage = user?.role === 'Admin' || user?.role === 'Instructor';
 
     const [filters, setFilters] = useState({
         keyword: '',
-        category: '',
+        subject: initialSubjectId,
         difficulty: '',
         status: '',
     });
@@ -29,7 +33,8 @@ const QuestionList = () => {
 
     useEffect(() => {
         loadQuestions();
-    }, [loadQuestions]);
+        fetchSubjects();
+    }, [loadQuestions, fetchSubjects]);
 
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this question?')) {
@@ -157,15 +162,18 @@ const QuestionList = () => {
                         </div>
 
                         <div className="w-full">
-                            <label className="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Category</label>
-                            <input
-                                type="text"
-                                name="category"
-                                value={filters.category}
+                            <label className="block text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-1.5">Subject</label>
+                            <select
+                                name="subject"
+                                value={filters.subject}
                                 onChange={handleFilterChange}
-                                placeholder="e.g. Mathematics"
-                                className="block w-full px-4 py-3 border border-gray-100 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 sm:text-sm rounded-xl transition-all"
-                            />
+                                className="block w-full pl-4 pr-10 py-3 text-sm border-gray-100 bg-gray-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 rounded-xl transition-all appearance-none cursor-pointer"
+                            >
+                                <option value="">All Subjects</option>
+                                {subjects.map(s => (
+                                    <option key={s._id} value={s._id}>{s.name} {s.parentSubjectId ? `(Sub)` : ''}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {canManage && (
@@ -193,11 +201,11 @@ const QuestionList = () => {
                             Search
                         </button>
 
-                        {(filters.keyword || filters.category || filters.difficulty || filters.status) && (
+                        {(filters.keyword || filters.subject || filters.difficulty || filters.status) && (
                             <button
                                 type="button"
                                 onClick={() => {
-                                    setFilters({ keyword: '', category: '', difficulty: '', status: '' });
+                                    setFilters({ keyword: '', subject: '', difficulty: '', status: '' });
                                     setSearchInput('');
                                     setPage(1);
                                 }}
@@ -276,7 +284,7 @@ const QuestionList = () => {
                                                 </h4>
 
                                                 <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
-                                                    <span>Category: <span className="font-medium text-gray-700">{question.category}</span></span>
+                                                    <span>Subject: <span className="font-medium text-gray-700">{question.subject?.name || 'Uncategorized'}</span></span>
                                                     <span className="hidden sm:inline">&bull;</span>
                                                     <span className="hidden sm:inline">Added by {question.createdBy?.name || 'Unknown'}</span>
                                                 </div>

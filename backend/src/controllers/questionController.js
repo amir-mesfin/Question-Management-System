@@ -9,7 +9,7 @@ export const createQuestion = async (req, res) => {
             title,
             type,
             difficulty,
-            category,
+            subject,
             tags,
             status,
             options,
@@ -22,7 +22,7 @@ export const createQuestion = async (req, res) => {
             title,
             type,
             difficulty,
-            category,
+            subject,
             tags,
             status,
             options,
@@ -44,7 +44,7 @@ export const createQuestion = async (req, res) => {
 // @access  Private
 export const getQuestions = async (req, res) => {
     try {
-        const { keyword, category, difficulty, status, page = 1, limit = 10 } = req.query;
+        const { keyword, subject, difficulty, status, page = 1, limit = 10 } = req.query;
 
         const query = {};
 
@@ -57,7 +57,7 @@ export const getQuestions = async (req, res) => {
         }
 
         // Filter by specific attributes
-        if (category) query.category = category;
+        if (subject) query.subject = subject;
         if (difficulty) query.difficulty = difficulty;
 
         // Restrict visibility based on roles
@@ -76,9 +76,10 @@ export const getQuestions = async (req, res) => {
 
         const questions = await Question.find(query)
             .populate('createdBy', 'name email')
+            .populate('subject', 'name')
             .skip(skip)
             .limit(pageSize)
-            .sort({ createdAt: -1 });
+            .sort({ subject: 1, createdAt: -1 });
 
         const total = await Question.countDocuments(query);
 
@@ -98,7 +99,9 @@ export const getQuestions = async (req, res) => {
 // @access  Private
 export const getQuestionById = async (req, res) => {
     try {
-        const question = await Question.findById(req.params.id).populate('createdBy', 'name email');
+        const question = await Question.findById(req.params.id)
+            .populate('createdBy', 'name email')
+            .populate('subject', 'name');
 
         if (!question) {
             return res.status(404).json({ message: 'Question not found' });

@@ -30,10 +30,10 @@ const questionSchema = new mongoose.Schema(
             enum: ['Easy', 'Medium', 'Hard'],
             default: 'Medium',
         },
-        category: {
-            type: String,
-            required: [true, 'Please specify a category or subject'],
-            trim: true,
+        subject: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Subject',
+            required: [true, 'Please specify a subject'],
         },
         tags: [
             {
@@ -43,7 +43,7 @@ const questionSchema = new mongoose.Schema(
         ],
         status: {
             type: String,
-            enum: ['Draft', 'Published'],
+            enum: ['Draft', 'Published', 'Archived'],
             default: 'Published',
         },
         createdBy: {
