@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaDownload, FaUpload } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaCheckCircle, FaExclamationCircle, FaSearch, FaFilter, FaChevronLeft, FaChevronRight, FaDownload, FaUpload, FaList, FaFolder } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
 import useSubjectStore from '../../store/subjectStore';
 import useAuthStore from '../../store/authStore';
@@ -26,6 +26,8 @@ const QuestionList = () => {
 
     // Use local state for the search input to prevent immediate re-fetching on every keystroke
     const [searchInput, setSearchInput] = useState('');
+
+    const isShowingFolders = !filters.subject && !filters.keyword && !filters.difficulty && !filters.status;
 
     const loadQuestions = useCallback(() => {
         fetchQuestions({ ...filters, page });
@@ -138,7 +140,7 @@ const QuestionList = () => {
                             <input
                                 type="text"
                                 className="block w-full pl-11 pr-4 py-3 border border-gray-100 rounded-xl leading-5 bg-gray-50/50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 sm:text-sm transition-all"
-                                placeholder="Search by title or tags..."
+                                placeholder="Search all questions..."
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
                             />
@@ -229,6 +231,44 @@ const QuestionList = () => {
             {isLoading && questions.length === 0 ? (
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+            ) : isShowingFolders ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <button
+                        onClick={() => { setFilters(prev => ({ ...prev, keyword: ' ' })); setPage(1); }}
+                        className="group bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-gray-300 transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full text-left"
+                    >
+                        <div className="flex-1">
+                            <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-600 flex items-center justify-center mb-6 group-hover:bg-gray-800 group-hover:text-white transition-colors duration-300">
+                                <FaList size={20} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-900 transition-colors">All Questions</h3>
+                            <p className="text-sm text-gray-500 line-clamp-2 mb-4">View every question across all subjects in a single list.</p>
+                        </div>
+                    </button>
+                    {subjects.map((subject) => (
+                        <button
+                            key={subject._id}
+                            onClick={() => { setFilters(prev => ({ ...prev, subject: subject._id })); setPage(1); }}
+                            className="group bg-white rounded-3xl p-6 shadow-sm hover:shadow-xl border border-gray-100 hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full text-left"
+                        >
+                            <div className="flex-1">
+                                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                                    <FaFolder size={20} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{subject.name}</h3>
+                                {subject.description && (
+                                    <p className="text-sm text-gray-500 line-clamp-2 mb-4">{subject.description}</p>
+                                )}
+                            </div>
+                            
+                            <div className="border-t border-gray-50 pt-4 mt-auto flex items-center justify-between">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gray-50 text-gray-600 text-[11px] font-black uppercase tracking-wider">
+                                    {subject.questionCount} {subject.questionCount === 1 ? 'Question' : 'Questions'}
+                                </span>
+                            </div>
+                        </button>
+                    ))}
                 </div>
             ) : questions.length === 0 ? (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">

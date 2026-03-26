@@ -77,7 +77,7 @@ const QuestionDetail = () => {
                                 {question.difficulty}
                             </span>
                             <span className="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                                {question.category}
+                                {question.subject?.name || 'Uncategorized'}
                             </span>
                             <span className="px-3 py-1 rounded-lg bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest border border-gray-100">
                                 {question.type}

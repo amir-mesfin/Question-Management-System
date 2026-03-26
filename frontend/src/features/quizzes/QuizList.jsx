@@ -26,6 +26,29 @@ const QuizList = () => {
         loadQuizzes();
     }, [loadQuizzes]);
 
+    // Auto-refresh when an upcoming quiz starts
+    useEffect(() => {
+        const upcomingQuizzes = quizzes.filter(q => q.status === 'upcoming' && q.startTime);
+        if (upcomingQuizzes.length === 0) return;
+
+        // Find the earliest start time
+        const now = new Date();
+        const nextStartTime = Math.min(...upcomingQuizzes.map(q => new Date(q.startTime).getTime()));
+        const delay = nextStartTime - now.getTime();
+
+        if (delay > 0) {
+            // Set a timeout to refresh the list exactly when the quiz starts (plus a small buffer)
+            const timer = setTimeout(() => {
+                loadQuizzes();
+            }, delay + 1000); 
+
+            return () => clearTimeout(timer);
+        } else {
+            // If the delay is already negative, it means a refresh is needed now
+            loadQuizzes();
+        }
+    }, [quizzes, loadQuizzes]);
+
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this quiz?')) {
             await deleteQuiz(id);
@@ -176,6 +199,16 @@ const QuizList = () => {
                                             <FaChartBar size={12} className="text-blue-500" />
                                             {quiz.questions?.length || 0} Questions
                                         </span>
+                                        {quiz.status && (
+                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
+                                                quiz.status === 'open' ? 'bg-green-50 text-green-600 border-green-100' :
+                                                quiz.status === 'upcoming' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                quiz.status === 'closed' ? 'bg-red-50 text-red-600 border-red-100' :
+                                                'bg-gray-100 text-gray-600 border-gray-200'
+                                            }`}>
+                                                {quiz.status === 'open' ? 'Available' : quiz.status}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="text-[10px] font-black text-gray-300 uppercase tracking-widest">
                                         {quiz.timeLimit ? `${quiz.timeLimit}m` : 'No Limit'}
@@ -187,9 +220,36 @@ const QuizList = () => {
                                         {quiz.title}
                                     </Link>
                                 </h4>
-                                <p className="text-gray-500 text-sm line-clamp-2 mb-6 font-medium leading-relaxed">
-                                    {quiz.description || "No description provided for this quiz."}
-                                </p>
+                                
+                                <div className="space-y-2 mb-6">
+                                    <p className="text-gray-500 text-sm line-clamp-2 font-medium leading-relaxed">
+                                        {quiz.description || "No description provided for this quiz."}
+                                    </p>
+                                    
+                                    {/* Dates and Attempts */}
+                                    <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest">
+                                        {quiz.startTime && (
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-gray-400">Starts</span>
+                                                <span className="text-gray-700">{new Date(quiz.startTime).toLocaleString()}</span>
+                                            </div>
+                                        )}
+                                        {quiz.endTime && (
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-gray-400">Ends</span>
+                                                <span className="text-gray-700">{new Date(quiz.endTime).toLocaleString()}</span>
+                                            </div>
+                                        )}
+                                        {quiz.maxAttempts > 0 && user.role === 'Student' && (
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-gray-400">Attempts</span>
+                                                <span className={quiz.attemptCount >= quiz.maxAttempts ? 'text-red-600' : 'text-green-600'}>
+                                                    {quiz.attemptCount} / {quiz.maxAttempts} Used
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
@@ -224,10 +284,20 @@ const QuizList = () => {
                                     )}
                                     <Link
                                         to={`/quizzes/${quiz._id}`}
-                                        className="flex items-center gap-2 bg-gray-900 text-white px-5 py-3 rounded-xl font-bold text-sm hover:bg-blue-600 shadow-lg shadow-gray-200 hover:shadow-blue-200 transition-all transform group-active:scale-95"
+                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm shadow-lg transition-all transform group-active:scale-95 ${
+                                            quiz.status === 'upcoming' 
+                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed pointer-events-none' 
+                                            : quiz.status === 'closed' || quiz.status === 'finished'
+                                            ? 'bg-red-50 text-red-400 cursor-not-allowed pointer-events-none'
+                                            : 'bg-gray-900 text-white hover:bg-blue-600'
+                                        }`}
                                     >
                                         <FaPlay size={10} />
-                                        <span>Start Quiz</span>
+                                        <span>
+                                            {quiz.status === 'upcoming' ? 'Upcoming' :
+                                             quiz.status === 'closed' ? 'Closed' :
+                                             quiz.status === 'finished' ? 'No Retries' : 'Start Quiz'}
+                                        </span>
                                     </Link>
                                 </div>
                             </div>

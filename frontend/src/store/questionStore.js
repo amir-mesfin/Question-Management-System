@@ -39,10 +39,10 @@ const useQuestionStore = create((set, get) => ({
     fetchQuestions: async (filters = {}) => {
         set({ isLoading: true, error: null });
         try {
-            const { keyword, category, difficulty, status, page = 1 } = filters;
+            const { keyword, subject, difficulty, status, page = 1 } = filters;
             let queryParams = `?page=${page}`;
             if (keyword) queryParams += `&keyword=${keyword}`;
-            if (category) queryParams += `&category=${category}`;
+            if (subject) queryParams += `&subject=${subject}`;
             if (difficulty) queryParams += `&difficulty=${difficulty}`;
             if (status) queryParams += `&status=${status}`;
 

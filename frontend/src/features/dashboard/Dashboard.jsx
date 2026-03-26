@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaQuestionCircle, FaLayerGroup, FaUsers, FaPlus, FaChevronRight, FaClock } from 'react-icons/fa';
 import useDashboardStore from '../../store/dashboardStore';
 import useAuthStore from '../../store/authStore';
@@ -8,12 +8,17 @@ import MathText from '../../components/MathText';
 const Dashboard = () => {
     const { stats, distribution, activity, isLoading, fetchStats, fetchDistribution, fetchRecentActivity } = useDashboardStore();
     const { user } = useAuthStore();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        if (user?.role === 'Student') {
+            navigate('/practice');
+            return;
+        }
         fetchStats();
         fetchDistribution();
         fetchRecentActivity();
-    }, [fetchStats, fetchDistribution, fetchRecentActivity]);
+    }, [fetchStats, fetchDistribution, fetchRecentActivity, user, navigate]);
 
     if (isLoading && !stats) {
         return (

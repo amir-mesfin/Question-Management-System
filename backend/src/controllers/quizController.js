@@ -6,7 +6,7 @@ import Attempt from '../models/Attempt.js';
 // @access  Private (Admin/Instructor)
 export const createQuiz = async (req, res) => {
     try {
-        const { title, description, questions, passingScore, timeLimit, isPublished } = req.body;
+        const { title, description, questions, passingScore, timeLimit, isPublished, maxAttempts, startTime, endTime } = req.body;
 
         const quiz = new Quiz({
             title,
@@ -15,6 +15,9 @@ export const createQuiz = async (req, res) => {
             passingScore,
             timeLimit,
             isPublished,
+            maxAttempts,
+            startTime,
+            endTime,
             createdBy: req.user._id,
         });
 
@@ -58,8 +61,28 @@ export const getQuizzes = async (req, res) => {
 
         const total = await Quiz.countDocuments(query);
 
+        // For students, add attempt info and status
+        let results = quizzes;
+        if (req.user.role === 'Student') {
+            const now = new Date();
+            results = await Promise.all(quizzes.map(async (quiz) => {
+                const attemptCount = await Attempt.countDocuments({ user: req.user._id, quiz: quiz._id });
+                
+                let status = 'open';
+                if (quiz.startTime && now < quiz.startTime) status = 'upcoming';
+                else if (quiz.endTime && now > quiz.endTime) status = 'closed';
+                else if (quiz.maxAttempts > 0 && attemptCount >= quiz.maxAttempts) status = 'finished';
+
+                return {
+                    ...quiz.toObject(),
+                    attemptCount,
+                    status
+                };
+            }));
+        }
+
         res.json({
-            quizzes,
+            quizzes: results,
             page: parseInt(page, 10),
             pages: Math.ceil(total / pageSize),
             total,

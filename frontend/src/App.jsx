@@ -34,7 +34,9 @@ function App() {
 
           {user && (
             <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-600">
-              <Link to="/" className="hover:text-blue-600 transition">Dashboard</Link>
+              {(user.role === 'Admin' || user.role === 'Instructor') && (
+                <Link to="/" className="hover:text-blue-600 transition">Dashboard</Link>
+              )}
               {(user.role === 'Admin' || user.role === 'Instructor') ? (
                   <Link to="/questions" className="hover:text-blue-600 transition">Questions</Link>
               ) : (
@@ -89,9 +91,11 @@ function App() {
         {/* Mobile Navigation */}
         {user && (
           <div className="md:hidden border-t border-gray-100 py-2 px-4 flex justify-around bg-gray-50/50">
-            <Link to="/" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
-              <span>Dashboard</span>
-            </Link>
+            {(user.role === 'Admin' || user.role === 'Instructor') && (
+              <Link to="/" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
+                <span>Dashboard</span>
+              </Link>
+            )}
             {(user.role === 'Admin' || user.role === 'Instructor') ? (
               <Link to="/questions" className="text-xs font-bold text-gray-600 hover:text-blue-600 flex flex-col items-center gap-1 p-2">
                 <span>Questions</span>
@@ -129,7 +133,7 @@ function App() {
             path="/"
             element={
               user ? (
-                user.role === 'Student' ? <Navigate to="/quizzes" /> : <Dashboard />
+                user.role === 'Student' ? <Navigate to="/practice" /> : <Dashboard />
               ) : (
                 <Navigate to="/login" />
               )
