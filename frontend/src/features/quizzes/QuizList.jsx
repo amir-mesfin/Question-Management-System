@@ -197,7 +197,7 @@ const QuizList = () => {
                                         )}
                                         <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
                                             <FaChartBar size={12} className="text-blue-500" />
-                                            {quiz.questions?.length || 0} Questions
+                                            {quiz.questionCount ?? quiz.questions?.length ?? 0} Questions
                                         </span>
                                         {quiz.status && (
                                             <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${

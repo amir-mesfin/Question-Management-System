@@ -1,5 +1,20 @@
 import User from '../models/User.js';
 
+// @desc    Student picklist for quiz access (Admin / Instructor)
+// @route   GET /api/users/students
+// @access  Private (Admin, Instructor)
+export const getStudentPicklist = async (req, res) => {
+    try {
+        const users = await User.find({ role: 'Student' })
+            .select('name email')
+            .sort({ name: 1 })
+            .lean();
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private (Admin)

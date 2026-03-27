@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+    getStudentPicklist,
     getUsers,
     createUser,
     deleteUser,
@@ -8,15 +9,14 @@ import { protect, authorize } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// All routes here are Admin only
 router.use(protect);
-router.use(authorize('Admin'));
+
+router.get('/students', authorize('Admin', 'Instructor'), getStudentPicklist);
 
 router.route('/')
-    .get(getUsers)
-    .post(createUser);
+    .get(authorize('Admin'), getUsers)
+    .post(authorize('Admin'), createUser);
 
-router.route('/:id')
-    .delete(deleteUser);
+router.route('/:id').delete(authorize('Admin'), deleteUser);
 
 export default router;
