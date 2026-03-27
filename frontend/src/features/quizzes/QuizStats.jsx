@@ -15,8 +15,8 @@ const QuizStats = () => {
         setIsLoading(true);
         try {
             const [attemptsRes, quizRes] = await Promise.all([
-                api.get(`/api/attempts/quiz/${id}`),
-                api.get(`/api/quizzes/${id}`)
+                api.get(`/attempts/quiz/${id}`),
+                api.get(`/quizzes/${id}`)
             ]);
             setAttempts(attemptsRes.data);
             setQuiz(quizRes.data);

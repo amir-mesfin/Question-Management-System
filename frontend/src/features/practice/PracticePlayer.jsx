@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../../services/api';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaTimesCircle, FaCheckCircle, FaCheck, FaRedo, FaList } from 'react-icons/fa';
 import useQuestionStore from '../../store/questionStore';
@@ -68,11 +69,22 @@ const PracticePlayer = () => {
     };
 
     const handleNext = () => {
-        setSessionStats(prev => ({ ...prev, total: prev.total + 1 }));
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-        } else {
+        const nextTotal = sessionStats.total + 1;
+        const isLast = currentQuestionIndex >= questions.length - 1;
+
+        setSessionStats((prev) => ({ ...prev, total: prev.total + 1 }));
+
+        if (isLast) {
             setIsFinished(true);
+            if (subjectId && nextTotal >= 1) {
+                api.post('/practice-sessions', {
+                    subjectId,
+                    correctCount: sessionStats.correct,
+                    totalAnswered: nextTotal,
+                }).catch(() => {});
+            }
+        } else {
+            setCurrentQuestionIndex((prev) => prev + 1);
         }
     };
 
